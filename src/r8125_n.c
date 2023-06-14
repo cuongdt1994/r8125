@@ -11501,6 +11501,21 @@ rtl8125_setup_mqs_reg(struct rtl8125_private *tp)
                 tp->imr_reg[i] = (u16)(IMR1_8125 + (i - 1) * 4);
         }
 }
+static int rtl8125_devname_configuration(struct rtl8125_private *tp)
+{
+        const char *devname;
+        int ret;
+
+        ret = of_property_read_string(tp->pci_dev->dev.of_node,
+                                      "label", &devname);
+
+        if (ret)
+                return ret;
+
+        strlcpy(tp->dev->name, devname, IFNAMSIZ);
+
+        return 0;
+}
 
 static void
 rtl8125_init_software_variable(struct net_device *dev)
@@ -12027,6 +12042,7 @@ rtl8125_init_software_variable(struct net_device *dev)
         if (tp->EnableRss)
                 rtl8125_init_rss(tp);
 #endif
+		rtl8125_devname_configuration(tp);
 		rtl8125_led_configuration(tp);
 }
 
